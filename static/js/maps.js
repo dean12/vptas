@@ -40,8 +40,26 @@ var colorScale = chroma
   .scale(['#D5E3FF', '#003171'])
   .domain([0,1]);
 
-//topoLayer.eachLayer(handleLayer);
+//Gets the origins of travel data;
+//Needs to pass the name of the LGA we are interested in to back end
+function getTravelOriginData(key_destination_lga){
+  var origins_json;
+  $.getJSON('/get_travel_origins', {
+        key_destination_lga: key_destination_lga
+      },
+    function(data){origins_json = data});
+  return   origins_json
 
+}
+
+function getTravelDestinationData(key_destination_lga){
+  destinations_json = $.getJSON('/get_travel_destinations', {
+        key_destination_lga: key_destination_lga
+      });
+  return destinations_json
+
+
+}
 
 
 function handleLayer(layer){
@@ -58,7 +76,8 @@ function handleLayer(layer){
 
   layer.on({
     mouseover: enterLayer,
-    mouseout: leaveLayer
+    mouseout: leaveLayer,
+    click: updateChoropleth_Origins,
   });
 }
 
@@ -87,6 +106,49 @@ function leaveLayer(){
   });
 }
 
+function updateChoropleth_Origins(e){
+  var layer = e.target
+  // Declare a global variable that can be used by the updateChoro... function
+  // This contains the name of the LGA area clicked on
+  lga_area = layer.feature.properties.vic_lga__3
+
+  // origin_choropleth_intensities is the json output from the ajax
+  // call to Flask
+  origin_choropleth_intensities =  getTravelOriginData(lga_area)
+
+  colorScale = chroma
+    .scale(['#D5E3FF', '#003171'])
+    .domain([0,getMaxValue(origin_choropleth_intensities)]);
+
+  // Get data corresponding to LGA clicked on
+  // Need to pass in 'layer' as well as JSON containing {Origin: count} data
+  topoLayer.eachLayer(updateChoroColours_Origins)
+
+}
+
+function updateChoroColours_Origins(layer){
+  var specific_lga_intensity = origin_choropleth_intensities[layer.feature.properties.vic_lga__3]
+
+  // Defines the fill colour for this specific LGA area
+  fillColor = colorScale(specific_lga_intensity).hex();
+
+
+  layer.setStyle({
+    fillColor : fillColor,
+    fillOpacity: 0.6,
+    color:'#555',
+    weight:1,
+    opacity:1
+  });
+
+}
+
+function getMaxValue(locations_json){
+  var values = $.map(locations_json, function(el) { return el; });
+  var max_value = Math.max(...values);
+  return max_value
+}
+
 // Popup tooltip that shows what LGA is under mouseover
 var info = L.control();
 
@@ -100,7 +162,7 @@ info.onAdd = function (mymap) {
 info.update = function (props) {
     //console.log(props.vic_lga__2);
     this._div.innerHTML = '<h4>Local Government Area</h4>' +  (props ?
-        '<b>' + props.vic_lga__2 + '</b>'
+        '<b>' + props.vic_lga__3 + '</b>'
         : 'Hover over a LGA');
 };
 
