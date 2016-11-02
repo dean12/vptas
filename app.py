@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import json
 import pandas as pd
 
@@ -19,14 +19,31 @@ def lga_map():
 @app.route("/get_travel_origins", methods = ['GET'])
 def travel_origins():
     key_destination_lga = request.args.get('key_destination_lga')
-    origins_series = origin_destination_df[key_destination_lga].fillna(value=0)
-    return json.dumps(origins_series.to_dict())
+    try:
+        origins_series = origin_destination_df[key_destination_lga].fillna(value=0)
+        return json.dumps(origins_series.to_dict())
+    except:
+        return not_found()
+
+
 
 @app.route("/get_travel_destinations", methods = ['GET'])
 def travel_destinations():
     key_origin_lga = request.args.get('key_lga')
     destinations_series = origin_destination_df.loc[key_origin_lga].fillna(value=0)
     return json.dumps(destinations_series.to_dict())
+
+@app.errorhandler(404)
+def not_found(error=None):
+    message = {
+            'status': 404,
+            'message': 'There does not appear to be any data for that LGA.',
+    }
+    resp = jsonify(message)
+    resp.status_code = 404
+
+    return resp
+
 
 
 if __name__ == "__main__":
