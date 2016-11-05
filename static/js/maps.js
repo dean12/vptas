@@ -4,7 +4,8 @@ var mymap = L.map('mapid').setView([-36.5083988,145.0811384], 7);
 // Imports the 'tile layer from the free open maps'
 L.tileLayer(
         'http://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-            maxZoom: 15,
+            maxZoom: 12,
+            minZoom: 6,
         }).addTo(mymap);
 
 mymap.createPane('labels');
@@ -12,7 +13,9 @@ mymap.getPane('labels').style.zIndex = 650;
 mymap.getPane('labels').style.pointerEvents = 'none';
 
 L.tileLayer('http://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
-        pane: 'labels'
+        pane: 'labels',
+        maxZoom: 12,
+        minZoom: 6
 }).addTo(mymap);
 
 
@@ -62,7 +65,7 @@ function handleLayer(layer){
     fillOpacity: 0.8,
     color:'#555',
     weight:1,
-    opacity:1
+    opacity:0.6
   });
 
   layer.on({
@@ -83,7 +86,7 @@ function enterLayer(e){
   info.update(layer.feature.properties);
   layer.setStyle({
     weight:3,
-    opacity: 1
+    opacity: 0.6
   });
 
   if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
@@ -96,7 +99,7 @@ function leaveLayer(){
   this.bringToBack();
   this.setStyle({
     weight:1,
-    opacity:1
+    opacity:0.6
   });
 }
 
@@ -131,7 +134,7 @@ function updateChoropleth_Origins(e){
         origin_choropleth_intensities = data;
         // Re-sets the colour scales based on the new data
         colorScale = chroma
-          .scale(['#f1eeec', '#e27474'])
+          .scale(['#F0F0AF', '#e27474'])
           .domain([0,getMaxValue(origin_choropleth_intensities)],50,'log');
 
         // Updates the intensities of each LGA
@@ -313,7 +316,7 @@ function drawChart(){
 /*
 ****** The below handles the Destinations map or the second tab in the UI
 */
-
+/*
 var mymap_dest = L.map('mapiddest').setView([-36.5083988,145.0811384], 7);
 
 // Imports the tile layer from the free open maps'
@@ -321,3 +324,4 @@ L.tileLayer(
         'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 15,
         }).addTo(mymap_dest);
+*/
