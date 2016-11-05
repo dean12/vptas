@@ -214,29 +214,57 @@ info.addTo(mymap);
 */
 
 function getPieDataset(lga_counts){
-  // Start with origin_choropleth_intensities
 
-  // Finds the top 4 locations from the json
-  result = []
-  for(var i in lga_counts)
-      result.push([i, lga_counts [i]]);
-  top4 = result.sort(function(a,b){return b[1] - a[1]}).slice(0, 4);
+  // 1: Get ordered list.
+  // 2: Run for loop over list
 
-  // Gets the sum of the others
-  var others = result.slice(4,result.length);
-  var others_total = 0
-  for (i = 0; i < others.length; i++) {
-    others_total += others[i][1]
+  // Ordered list of lgas
+
+vectorised_lgas = []
+for(var i in lga_counts) {
+      vectorised_lgas.push([i, lga_counts [i]])
+    };
+  ordered_lga_list =  vectorised_lgas.sort(function(a,b){return b[1] - a[1]})
+
+result = []
+for(var i in ordered_lga_list) {
+  if (ordered_lga_list[i][1] == 0){
+    break;
+  } else if(i==4){
+    var others = ordered_lga_list.slice(i,ordered_lga_list.length);
+    var others_total = 0;
+    for (j = 0; j < others.length; j++) {
+      others_total += others[j][1];
+    }
+    result.push({ lga_name: "OTHERS", count: others_total});
+    break;
+  } else {
+    result.push({lga_name: ordered_lga_list[i][0],
+                    count: ordered_lga_list[i][1]})
   }
+}
 
-  var pie_dataset = [
-    { lga_name: top4[0][0], count: top4[0][1] },
-    { lga_name: top4[1][0], count: top4[1][1] },
-    { lga_name: top4[2][0], count: top4[2][1] },
-    { lga_name: top4[3][0], count: top4[3][1] },
-    { lga_name: "OTHERS", count: others_total}
-  ];
-  return pie_dataset
+
+
+  /*
+  if(ordered_lga_list[i][1] != 0){
+    result.push({lga_name: ordered_lga_list[i][0],
+                    count: ordered_lga_list[i][1]})
+  } else{break};
+
+  if(i==3 && ordered_lga_list[i+1][1] != 0){
+    // Sum the remainder and add it to the "others" category
+    var others = ordered_lga_list.slice(i,ordered_lga_list.length);
+    var others_total = 0;
+    for (i = 0; i < others.length; i++) {
+      others_total += others[i][1];
+    }
+    result.push({ lga_name: "OTHERS", count: others_total});
+    break;
+  }
+}
+*/
+return result
 }
 
 function drawChart(){
