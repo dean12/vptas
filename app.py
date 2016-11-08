@@ -19,11 +19,13 @@ def lga_map():
 @app.route("/get_travel_origins", methods = ['GET'])
 def travel_origins():
     key_destination_lga = request.args.get('key_destination_lga')
-    try:
-        origins_series = origin_destination_df[key_destination_lga].fillna(value=0)
+    selected_year = request.args.get('selected_year')
+    if selected_year != 'All':
+        origins_series = origin_destination_df[key_destination_lga][int(selected_year)].fillna(value=0)
         return json.dumps(origins_series.to_dict())
-    except:
-        return not_found()
+    elif selected_year == 'All':
+        output = origin_destination_df[key_destination_lga][2015].fillna(value=0) + origin_destination_df[key_destination_lga][2016].fillna(value=0)
+        return json.dumps(output.to_dict())
 
 
 

@@ -56,6 +56,15 @@
             <li class="active"><a href="#">Origins </a></li>
             <li><a href="#about">Destinations </a></li>
           </ul>
+        <div id="selectdiv">
+          Show Year:
+          <select id="selectYear">
+            <option value="All">All Years</option>
+            <option value="2015">2015</option>
+            <option value="2016">2016</option>
+          </select>
+        </div>
+
         </div><!--/.nav-collapse -->
       </div>
     </nav>
@@ -65,8 +74,11 @@
     <div class="sidebar-wrapper">
       <div id="chart-container">
         <h3 class="sidebar-title">Click on a Local Government Area</h3>
-
+        <p class="sidebar-desc"><p>
       <svg class="chart"></svg>
+      <div class=" text-center">
+      <input type="button" onclick="downloadToCSV();" value="Export to CSV" class="btn btn-primary" id="CSVbtn">
+    </div>
     </div>
     </div>
   </div>
@@ -95,7 +107,10 @@
     <script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
      <!--<script src="static/js/leaflet-omnivore.js"></script> -->
     <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+
     <script src="{{ url_for('static', filename='js/chroma.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/CSVExport.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
 

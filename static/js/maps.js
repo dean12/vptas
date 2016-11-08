@@ -111,8 +111,11 @@ function updateChoropleth_Origins(e){
   // This contains the name of the LGA area clicked on
   lga_area = layer.feature.properties.vic_lga__3
   $(".sidebar-title").html(lga_area);
+  $(".sidebar-desc").html("Persons who commute to " + lga_area + " travel from:");
+  $("#CSVbtn").css('visibility','visible');
+  selected_year = document.getElementById( "selectYear" ).value
   //
-  getTravelOriginData(lga_area);
+  getTravelOriginData(lga_area,selected_year);
   layer.bringToFront();
   layer.setStyle({
     color:'#555',
@@ -121,12 +124,15 @@ function updateChoropleth_Origins(e){
 
   });
 
+}
+
   //Gets the origins of travel data;
   //Needs to pass the name of the LGA we are interested in to back end
-  function getTravelOriginData(key_destination_lga){
+  function getTravelOriginData(key_destination_lga, selected_year){
     var origins_json;
     $.getJSON('/get_travel_origins', {
-          key_destination_lga: key_destination_lga
+          key_destination_lga: key_destination_lga,
+          selected_year: selected_year
         },
       function(data){
         // Contains the response from the ajax call
@@ -137,23 +143,23 @@ function updateChoropleth_Origins(e){
           .scale(['#F0F0AF', '#e27474'])
           .domain([0,getMaxValue(origin_choropleth_intensities)],50,'log');
 
+          total_commuters = getCommuterSum(origin_choropleth_intensities);
+
         // Updates the intensities of each LGA
-        topoLayer.eachLayer(updateChoroColours_Origins)
-        drawChart()
-      }).fail();
-  }
-/* Move this to new map for destinations
-
-  function getTravelDestinationData(key_destination_lga){
-    destinations_json = $.getJSON('/get_travel_destinations', {
-          key_destination_lga: key_destination_lga
+        topoLayer.eachLayer(updateChoroColours_Origins);
+        drawChart();
+      }).fail(
+        function(jqXHR, status, error){
+          topoLayer.eachLayer(handleLayer);
+          d3.select('.chart').selectAll('g').remove();
+          bootbox.alert("There are no records of persons travelling to that area.");
+          CLICKED = false; // Resets tooltip
         });
-    return destinations_json
 
 
   }
-*/
-}
+
+
 
 // Loops over all LGA polygons and updates their colour based on the
 // new values
@@ -191,6 +197,22 @@ info.onAdd = function (mymap) {
 };
 
 
+// Function calulates total travellers for LGA that is clicked on
+function getCommuterSum(lga_counts){
+  var sum = 0
+
+  vectorised_lgas = []
+  for(var i in lga_counts) {
+        vectorised_lgas.push([i, lga_counts [i]])
+      };
+
+  for(var i in vectorised_lgas) {
+        sum += vectorised_lgas[i][1]
+      };
+  return sum
+}
+
+
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
@@ -201,7 +223,8 @@ info.update = function (props) {
         : '<p> Hover over a LGA </p>');
       } else {
         this._div.innerHTML = '<h4>Local Government Area</h4>' +  (props ?
-            '<b>' + props.vic_lga__3 + '</b>' + '</br>' + '<p>' + origin_choropleth_intensities[props.vic_lga__3] + '</p>'
+            '<b>' + props.vic_lga__3 + '</b>' + '</br>' + '<p>' + 'Count: '+ origin_choropleth_intensities[props.vic_lga__3] + '</br>' +
+            'Percentage: ' + (origin_choropleth_intensities[props.vic_lga__3]/total_commuters * 100).toFixed(2) + '%' + '</p>'
             : '<p> Hover over a LGA </p>');
       }
 };
@@ -214,11 +237,6 @@ info.addTo(mymap);
 */
 
 function getPieDataset(lga_counts){
-
-  // 1: Get ordered list.
-  // 2: Run for loop over list
-
-  // Ordered list of lgas
 
 vectorised_lgas = []
 for(var i in lga_counts) {
@@ -243,27 +261,6 @@ for(var i in ordered_lga_list) {
                     count: ordered_lga_list[i][1]})
   }
 }
-
-
-
-  /*
-  if(ordered_lga_list[i][1] != 0){
-    result.push({lga_name: ordered_lga_list[i][0],
-                    count: ordered_lga_list[i][1]})
-  } else{break};
-
-  if(i==3 && ordered_lga_list[i+1][1] != 0){
-    // Sum the remainder and add it to the "others" category
-    var others = ordered_lga_list.slice(i,ordered_lga_list.length);
-    var others_total = 0;
-    for (i = 0; i < others.length; i++) {
-      others_total += others[i][1];
-    }
-    result.push({ lga_name: "OTHERS", count: others_total});
-    break;
-  }
-}
-*/
 return result
 }
 
@@ -272,7 +269,7 @@ function drawChart(){
 
         var margin = {top: 0, right: 0, bottom: 0, left: 18};
         var width = 328;
-        var height = 550 - margin.top - margin.bottom;
+        var height = 540 - margin.top - margin.bottom;
         var radius = 120;
 
         var color = d3.scaleOrdinal()
@@ -310,6 +307,7 @@ function drawChart(){
             return color(d.data.lga_name);
           });
 
+            // Legend
           var legend = svg.selectAll('.legend')
             .data(color.domain())
             .enter()
@@ -319,7 +317,7 @@ function drawChart(){
               var height = legendRectSize + legendSpacing;
               var offset =  height * color.domain().length / 2;
               var horz = -2 * legendRectSize - 35;
-              var vert = i * 1.5 *  height - offset + 250;
+              var vert = i * 1.5 *  height - offset + 240;
               return 'translate(' + horz + ',' + vert +  ')';
             });
 
@@ -337,19 +335,14 @@ function drawChart(){
 
 
 
+// CSV Exporting button
+function downloadToCSV(){
+  var x = new CSVExport(vectorised_lgas);
+  return false;
+}
 
-
-
-
-/*
-****** The below handles the Destinations map or the second tab in the UI
-*/
-/*
-var mymap_dest = L.map('mapiddest').setView([-36.5083988,145.0811384], 7);
-
-// Imports the tile layer from the free open maps'
-L.tileLayer(
-        'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 15,
-        }).addTo(mymap_dest);
-*/
+document.getElementById( "selectYear" ).onchange = function() {
+    var index = this.selectedIndex;
+    var changed_year = this.children[index].value;
+    getTravelOriginData(lga_area,changed_year);
+}

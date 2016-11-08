@@ -81,3 +81,25 @@ body {
     font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif
 
   }
+
+.sidebar-desc {
+  margin-left: 15px;
+  margin-right: 10px;
+  color: #b9b7b7;
+}
+
+#CSVbtn {
+  margin-left: 105px;
+  margin-top: 15px;
+  visibility: hidden;
+}
+
+#CSVbtn {
+  margin-left: 15px;
+  margin-top: 15px;
+  visibility: hidden;
+}
+
+#selectYear {
+  margin-top: 15px;
+}
