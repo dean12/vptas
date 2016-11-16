@@ -346,3 +346,16 @@ document.getElementById( "selectYear" ).onchange = function() {
     var changed_year = this.children[index].value;
     getTravelOriginData(lga_area,changed_year);
 }
+
+/*
+// Layer Groups
+var choropleth_map = L.layerGroup(topoLayer);
+var overlayMaps = {
+    "Choropleth": choropleth_map
+    "Commuter Origins": commuter_origins
+};
+L.control.layers(overlayMaps).addTo(mymap);
+
+
+// Get the markers from json
+*/

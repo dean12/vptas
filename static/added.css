@@ -103,3 +103,10 @@ body {
 #selectYear {
   margin-top: 15px;
 }
+
+.slider-horizontal {
+  margin-left: 60px;
+  margin-top: 50px;
+  color: #ffffff;
+  visibility: hidden
+}
