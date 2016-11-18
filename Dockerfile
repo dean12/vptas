@@ -1,9 +1,15 @@
-FROM python:3.5
-MAINTAINER Rajdeep Dua "dua_rajdeep@yahoo.com"
+# install uwsgi and nginx in python3
+FROM tiangolo/uwsgi-nginx:python3.5
+
+COPY nginx.conf /etc/nginx/conf.d/
+
+# install geo packages
 RUN apt-get update -y
 RUN apt-get install -y libgdal-dev
-COPY . /app
+
 WORKDIR /app
+
+# install python dependencies
+COPY ./requirements.txt /app
 RUN pip3 install -r requirements.txt
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+COPY . /app
