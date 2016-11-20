@@ -132,10 +132,10 @@ function handleLayer(layer){
 
   layer.setStyle({
     color:'#555',
-    weight:1,
+    weight:0.8,
     opacity:0.6,
-    fillOpacity:0.07,
-    fillColor: '#f20202'
+    fillOpacity:0.8,
+    fillColor: '#ebbba3'
   });
 
   layer.on({

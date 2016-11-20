@@ -303,6 +303,14 @@ function drawChart(){
           .enter()
           .append('path')
           .attr('d', arc)
+          .transition().delay(function(d, i) { return i * 0; }).duration(700)
+          .attrTween('d', function(d) {
+            var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+            return function(t) {
+            d.endAngle = i(t);
+          return arc(d);
+          }
+          })
           .attr('fill', function(d) {
             return color(d.data.lga_name);
           });
