@@ -110,8 +110,8 @@ function updateChoropleth_Origins(e){
   // Declare a global variable that can be used by the updateChoro... function
   // This contains the name of the LGA area clicked on
   lga_area = layer.feature.properties.vic_lga__3
-  $(".sidebar-title").html(lga_area);
-  $(".sidebar-desc").html("Persons who commute to " + lga_area + " travel from:");
+  $(".sidebar-title").html(lga_area.toProperCase());
+  $(".sidebar-desc").html("Persons who travel to " + lga_area.toProperCase() + " for medical services are from:");
   $("#CSVbtn").css('visibility','visible');
   selected_year = document.getElementById( "selectYear" ).value
   //
@@ -219,11 +219,11 @@ info.update = function (props) {
     //console.log(props.vic_lga__2);
     if (CLICKED == false){
     this._div.innerHTML = '<h4>Local Government Area</h4>' +  (props ?
-        '<b>' + props.vic_lga__3 + '</b>'
+        '<b>' + props.vic_lga__3.toProperCase()+ '</b>'
         : '<p> Hover over a LGA </p>');
       } else {
         this._div.innerHTML = '<h4>Local Government Area</h4>' +  (props ?
-            '<b>' + props.vic_lga__3 + '</b>' + '</br>' + '<p>' + 'Count: '+ origin_choropleth_intensities[props.vic_lga__3] + '</br>' +
+            '<b>' + props.vic_lga__3.toProperCase() + '</b>' + '</br>' + '<p>' + 'Count: '+ origin_choropleth_intensities[props.vic_lga__3] + '</br>' +
             'Percentage: ' + (origin_choropleth_intensities[props.vic_lga__3]/total_commuters * 100).toFixed(2) + '%' + '</p>'
             : '<p> Hover over a LGA </p>');
       }
@@ -354,6 +354,11 @@ document.getElementById( "selectYear" ).onchange = function() {
     var changed_year = this.children[index].value;
     getTravelOriginData(lga_area,changed_year);
 }
+
+String.prototype.toProperCase = function () {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+
 
 /*
 // Layer Groups

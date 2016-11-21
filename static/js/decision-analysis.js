@@ -78,17 +78,18 @@ var markerClusters
 
   function clusterClick() {
 
-      $(".sidebar-desc").html("Change the cutoff bounary:");
+      $(".sidebar-desc").html("Change the cutoff boundary:");
       $(".slider-horizontal").css('visibility','visible');
     //Change sidebar to show new title
-    $(".sidebar-title").html("WARRNAMBOOL")
+    $(".sidebar-title").html("WARRNAMBOOL".toProperCase())
 
     // Ajax call to get the polygon data
     if (mymap.hasLayer(topoLayer) == false){
       $.getJSON('/warr_map')
       .done(addTopoData);
     }
-
+    $(".additional_covered").html("0");
+    $(".additional_covered_desc").html("additional people covered.");
 
     // Get get points and then render them to the map
 
@@ -129,15 +130,24 @@ var markerClusters
 
 // Handles the initial formatting of the choropleth
 function handleLayer(layer){
-
-  layer.setStyle({
-    color:'#555',
-    weight:0.8,
-    opacity:0.6,
-    fillOpacity:0.8,
-    fillColor: '#ebbba3'
-  });
-
+  // If layer is the state of vic then colour it blue
+  if (layer.feature.properties.isVictoria == 1){
+      layer.setStyle({
+        color:'#555',
+        weight:0.8,
+        opacity:0.6,
+        fillOpacity:0.4,
+        fillColor: '#2166ac'
+      });
+  } else{
+      layer.setStyle({
+        color:'#555',
+        weight:0.8,
+        opacity:0.6,
+        fillOpacity:0.1,
+        fillColor: '#ebbba3'
+      });
+  }
   layer.on({
     mouseover: enterLayer,
     mouseout: leaveLayer,
@@ -207,39 +217,72 @@ info.update = function (props) {
 var name_element = document.getElementById('slider-km').value;
 
 document.getElementById( 'slider-km' ).onchange = function() {
+  // Calculate additional people covered
+  additional_covered = 0
   topoLayer.eachLayer(distanceChange);
+  $(".additional_covered").html(numberWithCommas(additional_covered));
+  $(".additional_covered_desc").html("additional people covered.");
+
+  if (document.getElementById( 'slider-km' ).value == 5){
+    $(".additional_claims").html('193');
+    $(".additional_claims_desc").html("additional claims expected when compared to current policy.");
+  } else {
+    $(".additional_claims").html('');
+    $(".additional_claims_desc").html("");
+  }
 }
 
 function distanceChange(layer){
   slider_value = document.getElementById( 'slider-km' ).value
   // 100km
-  if (slider_value == 1 && layer.feature.properties.hundred == 0){
+  if (slider_value == 1 && layer.feature.properties.hundred == 1){
     layer.setStyle({
-      fillOpacity:0.07,
+      fillOpacity:0.8,
       fillColor: '#2166ac'
     });
-  } else if (slider_value == 2 && layer.feature.properties.ninetyfive == 0){
+    additional_covered += layer.feature.properties.DistanceMa;
+  } else if (slider_value == 2 && layer.feature.properties.ninetyfive == 1){
     layer.setStyle({
-      fillOpacity:0.07,
+      fillOpacity:0.8,
       fillColor: '#2166ac'
     });
-  } else if (slider_value == 3 && layer.feature.properties.ninety == 0){
+    additional_covered += layer.feature.properties.DistanceMa;
+  } else if (slider_value == 3 && layer.feature.properties.ninety == 1){
     layer.setStyle({
-      fillOpacity:0.07,
+      fillOpacity:0.8,
       fillColor: '#2166ac'
     });
-  } else if (slider_value == 4 && layer.feature.properties.eightyfive == 0){
+    additional_covered += layer.feature.properties.DistanceMa;
+  } else if (slider_value == 4 && layer.feature.properties.eightyfive == 1){
     layer.setStyle({
-      fillOpacity:0.07,
+      fillOpacity:0.8,
       fillColor: '#2166ac'
     });
-  }else if (slider_value == 5 && layer.feature.properties.eighty == 0){
+    additional_covered += layer.feature.properties.DistanceMa;
+  }else if (slider_value == 5 && layer.feature.properties.eighty == 1){
     layer.setStyle({
-      fillOpacity:0.07,
+      fillOpacity:0.8,
       fillColor: '#2166ac'
     });
-    }
+    additional_covered += layer.feature.properties.DistanceMa;
+  } else if (layer.feature.properties.isVictoria != 1) {
+    layer.setStyle({
+      fillOpacity:0.1,
+      fillColor: '#ebbba3'
+    })
+  }
+
 
 
   // If layer.properties."100km" == 1 then render it red, else render it blue
+}
+
+
+String.prototype.toProperCase = function () {
+    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
