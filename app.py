@@ -25,7 +25,7 @@ def travel_origins():
         origins_series = origin_destination_df[key_destination_lga][int(selected_year)].fillna(value=0)
         return json.dumps(origins_series.to_dict())
     elif selected_year == 'All':
-        # Deals with errors in adding pandas series that may arise
+        # Deals with errors in summing pandas series that may arise
         try:
             values_2015 = origin_destination_df[key_destination_lga][2015].fillna(value=0)
         except:

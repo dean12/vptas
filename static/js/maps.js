@@ -372,3 +372,21 @@ L.control.layers(overlayMaps).addTo(mymap);
 
 // Get the markers from json
 */
+
+// Login modal handlers
+$(document).ready(function(){
+
+
+        $("#modal-login").click(function(){
+          var username = document.getElementById('usrname').value
+          var password = document.getElementById('psw').value
+          if (username == 'kevin@geografia.com.au' && password == 'collinsstreet'){
+          $("#myModal").modal("hide");
+        }
+        })
+
+        $('#myModal').modal({
+          backdrop: 'static',
+          keyboard: false
+        })
+    });
