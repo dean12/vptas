@@ -84,7 +84,7 @@ def not_found(error=None):
 
 
 
-PORT = os.getenv('PORT', 8081)
+FLASK_PORT = os.getenv('PORT', 8081)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=PORT)
+    app.run(host='0.0.0.0', port=FLASK_PORT)
