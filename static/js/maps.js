@@ -374,19 +374,36 @@ L.control.layers(overlayMaps).addTo(mymap);
 */
 
 // Login modal handlers
-$(document).ready(function(){
+$(document).ready(function() {
+  $("#modal-login").click(function() {
+    sessionStorage.getItem('loggedIn');
+    var username = document.getElementById('usrname').value
+    var password = document.getElementById('psw').value;
+    if (username == 'kevin@geografia.com.au' && password ==
+      'collinsstreet') {
+      sessionStorage.setItem('loggedIn', "YES");
+      $("#myModal").modal("hide");
+      $("#logout-link").show()
+    }
+  })
 
+  $("#logout-link").click(function() {
+    sessionStorage.getItem('loggedIn');
+    $("#logout-link").hide()
+    sessionStorage.setItem('loggedIn', "NO");
+    $("#myModal").modal("show");
+  });
 
-        $("#modal-login").click(function(){
-          var username = document.getElementById('usrname').value
-          var password = document.getElementById('psw').value
-          if (username == 'kevin@geografia.com.au' && password == 'collinsstreet'){
-          $("#myModal").modal("hide");
-        }
-        })
+  $('#myModal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
 
-        $('#myModal').modal({
-          backdrop: 'static',
-          keyboard: false
-        })
-    });
+  if (sessionStorage.getItem('loggedIn') !== "YES") {
+    $("#myModal").modal("show");
+    $("#logout-link").hide();
+  } else {
+    $("#logout-link").show();
+    $("#myModal").modal("hide");
+  }
+});
